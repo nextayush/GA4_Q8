@@ -4,7 +4,6 @@ on:
   schedule:
     # Runs at 12:30 UTC every day
     - cron: '30 12 * * *'
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -14,17 +13,25 @@ jobs:
     steps:
     - name: Checkout repository - 24f1001993@ds.study.iitm.ac.in
       uses: actions/checkout@v4
-      
+      with:
+        # This is crucial for push permissions
+        fetch-depth: 0
+        
     - name: Create commit
       run: |
         # Create or update a file with the current timestamp
         echo "Automated daily update - $(date)" >> daily_log.txt
         
         # Configure git
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
+        git config --global user.name "Ayush Gupta"
+        git config --global user.email "ayush9251@gmail.com"
         
-        # Add, commit, and push changes
+        # Add and commit changes
         git add daily_log.txt
         git commit -m "Automated daily commit [$(date +'%Y-%m-%d %H:%M:%S')]"
-        git push
+        
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
